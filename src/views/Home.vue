@@ -8,7 +8,7 @@
         :info="card"
       />
     </div>
-    <div class="col-3">
+    <div class="col-3-sm">
       <div class="card">
         <div class="card-body">
           <h6 class="card-title text-muted">
@@ -17,7 +17,7 @@
           <story v-for="story in stories" :key="story" :info="story" />
         </div>
       </div>
-      <div class="card mt-3">
+      <div class="card mt-4">
         <div class="card-body">
           <h6 class="card-title text-muted">
             <strong>Suggestions for you</strong>
@@ -29,6 +29,29 @@
           />
         </div>
       </div>
+      <!--<form class="form-inline float-left mt-4"> !!v-model vjezba!!
+        <input
+          v-model="store.searchName"
+          class="form-control mr-sm-2"
+          type="search"
+          placeholder="Name"
+          aria-label="Search"
+        />
+      </form>
+      <form class="form-inline mx-auto mt-4">
+        <input
+          v-model="store.searchLastName"
+          class="form-control mr-sm-2"
+          type="search"
+          placeholder="Last Name"
+          aria-label="Search"
+        />
+      </form>
+      <div class="card mt-2">
+        <div class="card-body">
+          {{ store.searchName }} {{ store.searchLastName }}
+        </div>
+      </div>-->
     </div>
   </div>
 </template>
@@ -108,14 +131,8 @@ export default {
   computed: {
     filteredCards() {
       let termin = this.store.searchTerm;
-      let newCards = [];
 
-      for (let card of this.cards) {
-        if (card.user.indexOf(termin) >= 0) {
-          newCards.push(card);
-        }
-      }
-      return newCards;
+      return this.cards.filter((card) => card.user.includes(termin));
     },
   },
   components: {
