@@ -2,7 +2,11 @@
   <div class="row">
     <div class="col-1"></div>
     <div class="col-7">
-      <fipugram-card v-for="card in cards" :key="card" :info="card" />
+      <fipugram-card
+        v-for="card in filteredCards"
+        :key="card.url"
+        :info="card"
+      />
     </div>
     <div class="col-3">
       <div class="card">
@@ -34,6 +38,7 @@
 import Suggestion from "@/components/Suggestion.vue";
 import Story from "@/components/Story.vue";
 import FipugramCard from "@/components/FipugramCard.vue";
+import store from "@/store";
 
 let cards = [];
 let suggestions = [];
@@ -94,10 +99,24 @@ export default {
   name: "Home",
   data: function() {
     return {
-      cards: cards,
-      suggestions: suggestions,
-      stories: stories,
+      cards,
+      suggestions,
+      stories,
+      store,
     };
+  },
+  computed: {
+    filteredCards() {
+      let termin = this.store.searchTerm;
+      let newCards = [];
+
+      for (let card of this.cards) {
+        if (card.user.indexOf(termin) >= 0) {
+          newCards.push(card);
+        }
+      }
+      return newCards;
+    },
   },
   components: {
     FipugramCard,

@@ -23,10 +23,19 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarToggler">
-        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-          <li class="nav-item">
+        <form class="form-inline mx-auto">
+          <input
+            v-model="store.searchTerm"
+            class="form-control mr-sm-2"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+          />
+        </form>
+        <ul class="navbar-nav ml-auto">
+          <!--<li class="nav-item">
             <router-link to="/" class="nav-link">Home</router-link>
-          </li>
+          </li>-->
           <li class="nav-item">
             <router-link to="/login" class="nav-link">Login</router-link>
           </li>
@@ -34,18 +43,24 @@
             <router-link to="/signup" class="nav-link">Signup</router-link>
           </li>
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-          <input
-            class="form-control mr-sm-2"
-            type="search"
-            placeholder="Search"
-          />
-        </form>
       </div>
     </nav>
     <router-view />
   </div>
 </template>
+
+<script>
+import store from "@/store";
+
+export default {
+  name: "app",
+  data() {
+    return {
+      store,
+    };
+  },
+};
+</script>
 
 <style lang="scss">
 #app {
