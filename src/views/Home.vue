@@ -29,7 +29,7 @@
           />
         </div>
       </div>
-      <!--<form class="form-inline float-left mt-4"> !!v-model vjezba!!
+      <form class="form-inline float-left mt-4">
         <input
           v-model="store.searchName"
           class="form-control mr-sm-2"
@@ -51,7 +51,7 @@
         <div class="card-body">
           {{ store.searchName }} {{ store.searchLastName }}
         </div>
-      </div>-->
+      </div>
     </div>
   </div>
 </template>

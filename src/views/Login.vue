@@ -1,6 +1,6 @@
 <template>
-  <div class="about">
-    <h1>This is an login page</h1>
+  <div class="about text-center">
+    <h1>This is a login page</h1>
     <div class="container">
       <div class="row">
         <div class="col-sm"></div>

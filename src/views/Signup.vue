@@ -52,6 +52,8 @@
 </template>
 
 <script>
+//import { firebase } from "@/firebase";
+
 export default {
   name: "Signup",
   data() {
@@ -62,9 +64,7 @@ export default {
     };
   },
   methods: {
-    signup() {
-      alert(this.username);
-    },
+    signup() {},
   },
 };
 </script>
