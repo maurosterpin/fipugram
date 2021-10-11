@@ -52,7 +52,7 @@
 </template>
 
 <script>
-//import { firebase } from "@/firebase";
+import firebase from "@/firebase";
 
 export default {
   name: "Signup",
@@ -64,7 +64,19 @@ export default {
     };
   },
   methods: {
-    signup() {},
+    signup() {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.username, this.password)
+        .then(function() {
+          console.log("Uspjesna registracija");
+        })
+        .catch(function(error) {
+          console.log("Doslo je do greske", error);
+          alert(error);
+        });
+      console.log("Nastavak");
+    },
   },
 };
 </script>

@@ -36,11 +36,14 @@
           <!--<li class="nav-item">
             <router-link to="/" class="nav-link">Home</router-link>
           </li>-->
-          <li class="nav-item">
+          <li v-if="!store.currentUser" class="nav-item">
             <router-link to="/login" class="nav-link">Login</router-link>
           </li>
-          <li class="nav-item">
+          <li v-if="!store.currentUser" class="nav-item">
             <router-link to="/signup" class="nav-link">Signup</router-link>
+          </li>
+          <li v-if="store.currentUser" class="nav-item">
+            <a href="#" @click="logout" class="nav-link">Sign out</a>
           </li>
         </ul>
       </div>
@@ -51,6 +54,22 @@
 
 <script>
 import store from "@/store";
+import firebase from "@/firebase";
+import router from "@/router";
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) {
+    console.log(user.email);
+    store.currentUser = user.email;
+  } else {
+    console.log("No user");
+    store.currentUser = null;
+
+    if (router.name != "Login") {
+      router.push({ name: "Login" });
+    }
+  }
+});
 
 export default {
   name: "app",
@@ -58,6 +77,16 @@ export default {
     return {
       store,
     };
+  },
+  methods: {
+    logout() {
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          this.$router.push({ name: "Login" });
+        });
+    },
   },
 };
 </script>
