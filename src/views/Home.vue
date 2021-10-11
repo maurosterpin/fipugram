@@ -1,14 +1,29 @@
 <template>
   <div class="row">
     <div class="col-1"></div>
-    <div class="col-7">
+    <div class="col-6">
+      <!-- nova forma za post -->
+      <form @submit.prevent="postNewImage" class="form-inline mb-5">
+        <div class="form-group">
+          <label for="imageUrl">Image URL</label>
+          <input
+            v-model="newImageUrl"
+            type="text"
+            class="form-control ml-2"
+            placeholder="Enter the image URL"
+            id="imageUrl"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary ml-2">Post image</button>
+      </form>
+      <!-- listanje kartica -->
       <fipugram-card
         v-for="card in filteredCards"
         :key="card.url"
         :info="card"
       />
     </div>
-    <div class="col-3-sm">
+    <div class="col-4-sm">
       <div class="card">
         <div class="card-body">
           <h6 class="card-title text-muted">
@@ -62,6 +77,7 @@ import Suggestion from "@/components/Suggestion.vue";
 import Story from "@/components/Story.vue";
 import FipugramCard from "@/components/FipugramCard.vue";
 import store from "@/store";
+import { db } from "@/firebase";
 
 let cards = [];
 let suggestions = [];
@@ -126,7 +142,30 @@ export default {
       suggestions,
       stories,
       store,
+      newImageUrl: "",
     };
+  },
+  methods: {
+    postNewImage() {
+      console.log("OK!");
+
+      const imageUrl = this.newImageUrl;
+      db.collection("posts")
+        .add({
+          url: imageUrl,
+          user: store.currentUser,
+          posted_at: Date.now(),
+        })
+        .then((doc) => {
+          console.log("Spremljeno", doc);
+          alert("Slika uspjesno objavljena");
+          this.newImageUrl = "";
+        })
+        .catch((e) => {
+          console.error(e);
+          alert("Slika nije uspjesno objavljena");
+        });
+    },
   },
   computed: {
     filteredCards() {

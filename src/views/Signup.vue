@@ -31,12 +31,12 @@
               />
             </div>
             <div class="form-group">
-              <label for="exampleInputPassword1">Repeat Password</label>
+              <label for="exampleInputPassword2">Repeat Password</label>
               <input
                 type="password"
-                v-model="repeatPassword"
+                v-model="passwordRepeat"
                 class="form-control"
-                id="exampleInputPassword1"
+                id="exampleInputPassword2"
                 placeholder="Repeat Password"
               />
             </div>
@@ -65,17 +65,25 @@ export default {
   },
   methods: {
     signup() {
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(this.username, this.password)
-        .then(function() {
-          console.log("Uspjesna registracija");
-        })
-        .catch(function(error) {
-          console.log("Doslo je do greske", error);
-          alert(error);
-        });
-      console.log("Nastavak");
+      if (this.password === this.passwordRepeat) {
+        firebase
+          .auth()
+          .createUserWithEmailAndPassword(
+            this.username,
+            this.password,
+            this.passwordRepeat
+          )
+          .then(function() {
+            console.log("Uspjesna registracija");
+          })
+          .catch(function(error) {
+            console.log("Doslo je do greske", error);
+            alert(error);
+          });
+        console.log("Nastavak");
+      } else {
+        alert("Repeat password doesn't match password!");
+      }
     },
   },
 };
