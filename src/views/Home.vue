@@ -19,7 +19,7 @@
       <!-- listanje kartica -->
       <fipugram-card
         v-for="card in filteredCards"
-        :key="card.url"
+        :key="card.id"
         :info="card"
       />
     </div>
@@ -79,7 +79,7 @@ import FipugramCard from "@/components/FipugramCard.vue";
 import store from "@/store";
 import { db } from "@/firebase";
 
-let cards = [];
+//let cards = [];
 let suggestions = [];
 let stories = [];
 
@@ -113,7 +113,7 @@ suggestions = [
   },
 ];
 
-cards = [
+/*cards = [
   {
     url: "https://picsum.photos/id/1015/800",
     user: "username1",
@@ -132,20 +132,46 @@ cards = [
     pic: "@/assets/92.jpg",
     time: "3 DAYS AGO",
   },
-];
+];*/
 
 export default {
   name: "Home",
   data: function() {
     return {
-      cards,
+      cards: [],
       suggestions,
       stories,
       store,
       newImageUrl: "",
     };
   },
+  mounted() {
+    console.log("TEST!!!", this.getPosts());
+  },
   methods: {
+    getPosts() {
+      console.log("Firebase dohvat");
+
+      db.collection("posts")
+        .orderBy("posted_at", "desc")
+        .limit(10)
+        .get()
+        .then((query) => {
+          this.cards = [];
+          query.forEach((doc) => {
+            //console.log("ID: ", doc.id);
+            //console.log("Podaci: ", doc.data());
+            const data = doc.data();
+            this.cards.push({
+              id: doc.id,
+              time: data.posted_at,
+              url: data.url,
+              user: data.url,
+              pic: data.url,
+            });
+          });
+        });
+    },
     postNewImage() {
       console.log("OK!");
 
@@ -160,6 +186,7 @@ export default {
           console.log("Spremljeno", doc);
           alert("Slika uspjesno objavljena");
           this.newImageUrl = "";
+          this.getPosts();
         })
         .catch((e) => {
           console.error(e);

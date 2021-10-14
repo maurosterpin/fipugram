@@ -53,7 +53,7 @@
       <div>
         <strong>{{ info.user }}</strong> city, country
       </div>
-      <div>{{ info.time }}</div>
+      <div>{{ postedFromNow }}</div>
     </div>
     <div class="input-group input-group-lg">
       <input
@@ -86,8 +86,14 @@
 </style>
 
 <script>
+import moment from "moment";
 export default {
   props: ["info"],
   name: "FipugramCard",
+  computed: {
+    postedFromNow() {
+      return moment(this.info.time).fromNow();
+    },
+  },
 };
 </script>
