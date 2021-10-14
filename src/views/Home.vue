@@ -3,16 +3,14 @@
     <div class="col-1"></div>
     <div class="col-6">
       <!-- nova forma za post -->
-      <form @submit.prevent="postNewImage" class="form-inline mb-5">
+      <form @submit.prevent="postNewImage" class="mb-5">
         <div class="form-group">
-          <label for="imageUrl">Image URL</label>
-          <input
-            v-model="newImageUrl"
-            type="text"
-            class="form-control ml-2"
-            placeholder="Enter the image URL"
-            id="imageUrl"
-          />
+          <croppa
+            :width="400"
+            :height="400"
+            placeholder="Upload img"
+            v-model="imageReference"
+          ></croppa>
         </div>
         <button type="submit" class="btn btn-primary ml-2">Post image</button>
       </form>
@@ -77,7 +75,7 @@ import Suggestion from "@/components/Suggestion.vue";
 import Story from "@/components/Story.vue";
 import FipugramCard from "@/components/FipugramCard.vue";
 import store from "@/store";
-import { db } from "@/firebase";
+import { db, storage } from "@/firebase";
 
 //let cards = [];
 let suggestions = [];
@@ -143,6 +141,7 @@ export default {
       stories,
       store,
       newImageUrl: "",
+      imageReference: null,
     };
   },
   mounted() {
@@ -174,24 +173,45 @@ export default {
     },
     postNewImage() {
       console.log("OK!");
+      this.imageReference.generateBlob((blobData) => {
+        console.log(blobData);
 
-      const imageUrl = this.newImageUrl;
-      db.collection("posts")
-        .add({
-          url: imageUrl,
-          user: store.currentUser,
-          posted_at: Date.now(),
-        })
-        .then((doc) => {
-          console.log("Spremljeno", doc);
-          alert("Slika uspjesno objavljena");
-          this.newImageUrl = "";
-          this.getPosts();
-        })
-        .catch((e) => {
-          console.error(e);
-          alert("Slika nije uspjesno objavljena");
-        });
+        let imageName =
+          "posts/" + store.currentUser + "/" + Date.now() + ".png";
+        storage
+          .ref(imageName)
+          .put(blobData)
+          .then((result) => {
+            result.ref
+              .getDownloadURL()
+              .then((url) => {
+                const imageUrl = this.newImageUrl;
+                db.collection("posts")
+                  .add({
+                    url: url,
+                    user: store.currentUser,
+                    posted_at: Date.now(),
+                  })
+                  .then((doc) => {
+                    console.log("Spremljeno", doc);
+                    alert("Slika uspjesno objavljena");
+                    this.newImageUrl = "";
+                    this.imageReference.remove();
+                    this.getPosts();
+                  })
+                  .catch((e) => {
+                    console.error(e);
+                    alert("Slika nije uspjesno objavljena");
+                  });
+              })
+              .catch((e) => {
+                console.error(e);
+              });
+          })
+          .catch((e) => {
+            console.error(e);
+          });
+      });
     },
   },
   computed: {
