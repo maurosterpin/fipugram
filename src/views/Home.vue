@@ -171,47 +171,47 @@ export default {
           });
         });
     },
+    getImage() {
+      return new Promise((resolveFn, errorFn) => {
+        this.imageReference.generateBlob((data) => {
+          resolveFn(data);
+        });
+      });
+    },
     postNewImage() {
       console.log("OK!");
-      this.imageReference.generateBlob((blobData) => {
-        console.log(blobData);
+      //this.imageReference.generateBlob((blobData) => {
+      this.getImage()
+        .then((data) => {
+          console.log(blobData);
 
-        let imageName =
-          "posts/" + store.currentUser + "/" + Date.now() + ".png";
-        storage
-          .ref(imageName)
-          .put(blobData)
-          .then((result) => {
-            result.ref
-              .getDownloadURL()
-              .then((url) => {
-                const imageUrl = this.newImageUrl;
-                db.collection("posts")
-                  .add({
-                    url: url,
-                    user: store.currentUser,
-                    posted_at: Date.now(),
-                  })
-                  .then((doc) => {
-                    console.log("Spremljeno", doc);
-                    alert("Slika uspjesno objavljena");
-                    this.newImageUrl = "";
-                    this.imageReference.remove();
-                    this.getPosts();
-                  })
-                  .catch((e) => {
-                    console.error(e);
-                    alert("Slika nije uspjesno objavljena");
-                  });
-              })
-              .catch((e) => {
-                console.error(e);
-              });
-          })
-          .catch((e) => {
-            console.error(e);
+          let imageName =
+            "posts/" + store.currentUser + "/" + Date.now() + ".png";
+          return storage.ref(imageName).put(blobData);
+        })
+
+        .then((result) => {
+          return result.ref.getDownloadURL();
+        })
+        .then((url) => {
+          const imageUrl = this.newImageUrl;
+          return db.collection("posts").add({
+            url: url,
+            user: store.currentUser,
+            posted_at: Date.now(),
           });
-      });
+        })
+        .then((doc) => {
+          console.log("Spremljeno", doc);
+          alert("Slika uspjesno objavljena");
+          this.newImageUrl = "";
+          this.imageReference.remove();
+          this.getPosts();
+        })
+        .catch((e) => {
+          console.error(e);
+          alert("Slika nije uspjesno objavljena");
+        });
     },
   },
   computed: {
