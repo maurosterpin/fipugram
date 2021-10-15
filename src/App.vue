@@ -1,8 +1,12 @@
 <template>
   <div id="app">
-    <nav id="nav" class="navbar navbar-expand-lg navbar-light">
+    <nav
+      id="nav"
+      class="navbar navbar-expand-lg navbar-light bg-white mb-4 border"
+    >
       <a class="navbar-brand" href="#">
         <img
+          v-if="store.currentUser"
           src="@/assets/fipu_logo.png"
           height="40"
           class="d-inline-block align-top"
@@ -23,10 +27,10 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarToggler">
-        <form class="form-inline mx-auto">
+        <form v-if="store.currentUser" class="form-inline mx-auto">
           <input
             v-model="store.searchTerm"
-            class="form-control mr-sm-2"
+            class="form-control bg-light"
             type="search"
             placeholder="Search"
             aria-label="Search"
@@ -35,12 +39,15 @@
         <ul class="navbar-nav ml-auto">
           <!--<li class="nav-item">
             <router-link to="/" class="nav-link">Home</router-link>
-          </li>-->
+          </li>
           <li v-if="!store.currentUser" class="nav-item">
             <router-link to="/login" class="nav-link">Login</router-link>
           </li>
           <li v-if="!store.currentUser" class="nav-item">
             <router-link to="/signup" class="nav-link">Signup</router-link>
+          </li>-->
+          <li v-if="store.currentUser" class="nav-item">
+            <a href="#" @click="ž;" class="nav-link">Profile</a>
           </li>
           <li v-if="store.currentUser" class="nav-item">
             <a href="#" @click="logout" class="nav-link">Sign out</a>

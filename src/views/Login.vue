@@ -1,42 +1,50 @@
 <template>
   <div class="about text-center">
-    <h1>This is a login page</h1>
     <div class="container">
-      <div class="row">
-        <div class="col-sm"></div>
-        <div class="col-sm">
+      <div>
+        <div class="bg-white p-5 mx-auto border" style="width:350px">
+          <img
+            src="@/assets/fipu_logo.png"
+            height="80"
+            class="d-inline-block align-top mb-5"
+            alt=""
+            loading="lazy"
+          />
           <form>
             <div class="form-group">
-              <label for="exampleInputEmail1">Email address</label>
               <input
                 type="email"
                 v-model="username"
-                class="form-control"
+                class="form-control bg-light"
                 id="exampleInputEmail1"
                 aria-describedby="emailHelp"
-                placeholder="Enter email"
+                placeholder="Email address"
               />
-              <small id="emailHelp" class="form-text text-muted"
-                >We'll never share your email with anyone else.</small
-              >
             </div>
             <div class="form-group">
-              <label for="exampleInputPassword1">Password</label>
               <input
                 v-model="password"
                 type="password"
-                class="form-control"
+                class="form-control bg-light"
                 id="exampleInputPassword1"
                 placeholder="Password"
               />
             </div>
-            <button type="button" @click="login()" class="btn btn-primary">
-              Submit
+            <button
+              type="button"
+              @click="login()"
+              class="btn btn-primary"
+              style="font-size: 13px; font-weight:600;"
+            >
+              Log In
             </button>
           </form>
         </div>
-        <div class="col-sm"></div>
       </div>
+    </div>
+    <div class="bg-white p-4 mx-auto mt-3 border" style="width:350px">
+      Don't have an account?
+      <a href="signup" class="primary" style="font-weight:600">Sign up</a>
     </div>
   </div>
 </template>
@@ -69,3 +77,15 @@ export default {
   },
 };
 </script>
+
+<style>
+body {
+  font-size: 14px;
+}
+input[type="email"],
+input[type="password"],
+input,
+input::-webkit-input-placeholder {
+  font-size: 12px;
+}
+</style>

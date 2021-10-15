@@ -173,41 +173,35 @@ export default {
     },
     getImage() {
       return new Promise((resolveFn, errorFn) => {
-        this.imageReference.generateBlob((blobData) => {
-          resolveFn(blobData);
+        this.imageReference.generateBlob((data) => {
+          resolveFn(data);
         });
       });
     },
-    postNewImage() {
-      this.getImage()
-        .then((blobData) => {
-          console.log(blobData);
-          let imageName =
-            "posts/" + store.currentUser + "/" + Date.now() + ".png";
-          return storage.ref(imageName).put(blobData);
-        })
-        .then((result) => {
-          return result.ref.getDownloadURL();
-        })
-        .then((url) => {
-          const imageUrl = this.newImageUrl;
-          return db.collection("posts").add({
-            url: url,
-            user: store.currentUser,
-            posted_at: Date.now(),
-          });
-        })
-        .then((doc) => {
-          console.log("Spremljeno", doc);
-          this.newImageUrl = "";
-          this.imageReference.remove();
-          this.getPosts();
-        })
-        .catch((e) => {
-          console.error(e);
+    async postNewImage() {
+      try {
+        let blobData = await this.getImage();
+        let imageName =
+          "posts/" + store.currentUser + "/" + Date.now() + ".png";
+        let result = await storage.ref(imageName).put(blobData);
+        let url = await result.ref.getDownloadURL();
+        console.log("Public link: ", url);
+        const imageUrl = this.newImageUrl;
+        let doc = await db.collection("posts").add({
+          url: url,
+          user: store.currentUser,
+          posted_at: Date.now(),
         });
+        console.log("Spremljeno", doc);
+        this.newImageUrl = "";
+        this.imageReference.remove();
+        this.getPosts();
+      } catch (e) {
+        console.error("Error", e);
+      }
     },
   },
+
   computed: {
     filteredCards() {
       let termin = this.store.searchTerm;
