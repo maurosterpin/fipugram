@@ -173,23 +173,19 @@ export default {
     },
     getImage() {
       return new Promise((resolveFn, errorFn) => {
-        this.imageReference.generateBlob((data) => {
-          resolveFn(data);
+        this.imageReference.generateBlob((blobData) => {
+          resolveFn(blobData);
         });
       });
     },
     postNewImage() {
-      console.log("OK!");
-      //this.imageReference.generateBlob((blobData) => {
       this.getImage()
-        .then((data) => {
+        .then((blobData) => {
           console.log(blobData);
-
           let imageName =
             "posts/" + store.currentUser + "/" + Date.now() + ".png";
           return storage.ref(imageName).put(blobData);
         })
-
         .then((result) => {
           return result.ref.getDownloadURL();
         })
@@ -203,14 +199,12 @@ export default {
         })
         .then((doc) => {
           console.log("Spremljeno", doc);
-          alert("Slika uspjesno objavljena");
           this.newImageUrl = "";
           this.imageReference.remove();
           this.getPosts();
         })
         .catch((e) => {
           console.error(e);
-          alert("Slika nije uspjesno objavljena");
         });
     },
   },
