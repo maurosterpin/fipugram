@@ -1,7 +1,7 @@
 <template>
   <div class="card mb-4">
     <div class="card-header bg-transparent">
-      <img :src="info.url" width="35" class="rounded-circle" />
+      <img :src="info.pic" width="35" class="rounded-circle" />
       <strong class="ml-3">{{ info.user }}</strong>
     </div>
     <div class="card-body p-0"></div>
@@ -48,7 +48,8 @@
         />
       </svg>
       <div>
-        Liked by <strong>{{ info.user }}</strong> and <strong>others</strong>
+        Liked by <strong>{{ info.user }}</strong> and
+        <strong>others</strong>
       </div>
       <div>
         <strong>{{ info.user }}</strong> city, country

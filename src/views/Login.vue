@@ -1,5 +1,5 @@
 <template>
-  <div class="about text-center">
+  <div class="about text-center mt-5 pt-5">
     <div class="container">
       <div>
         <div class="bg-white p-5 mx-auto border" style="width:350px">
@@ -31,10 +31,21 @@
               />
             </div>
             <button
+              v-if="enable"
               type="button"
               @click="login()"
               class="btn btn-primary"
-              style="font-size: 13px; font-weight:600;"
+              style="font-size: 13px; font-weight:600; width:250px;"
+            >
+              Log In
+            </button>
+            <button
+              v-if="!enable"
+              type="button"
+              @click="login()"
+              class="btn btn-primary"
+              style="font-size: 13px; font-weight:600; width:250px;"
+              disabled
             >
               Log In
             </button>
@@ -51,10 +62,13 @@
 <script>
 import firebase from "@/firebase";
 
+let enable = false;
+
 export default {
   name: "Login",
   data() {
     return {
+      enable,
       username: "",
       password: "",
     };

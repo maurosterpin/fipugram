@@ -3,4 +3,6 @@ export default {
     searchName: "",
     searchLastName: "",
     currentUser: null,
+    displayName: "",
+    profilePic: "",
 };

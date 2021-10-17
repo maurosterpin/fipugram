@@ -1,10 +1,11 @@
 <template>
   <div id="app">
     <nav
+      v-if="store.currentUser"
       id="nav"
       class="navbar navbar-expand-lg navbar-light bg-white mb-4 border"
     >
-      <a class="navbar-brand" href="#">
+      <router-link to="/" class="nav-link">
         <img
           v-if="store.currentUser"
           src="@/assets/fipu_logo.png"
@@ -13,7 +14,7 @@
           alt=""
           loading="lazy"
         />
-      </a>
+      </router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -47,7 +48,7 @@
             <router-link to="/signup" class="nav-link">Signup</router-link>
           </li>-->
           <li v-if="store.currentUser" class="nav-item">
-            <a href="#" @click="ž;" class="nav-link">Profile</a>
+            <router-link to="/profile" class="nav-link">Profile</router-link>
           </li>
           <li v-if="store.currentUser" class="nav-item">
             <a href="#" @click="logout" class="nav-link">Sign out</a>

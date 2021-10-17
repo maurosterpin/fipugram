@@ -1,5 +1,5 @@
 <template>
-  <div class="about text-center">
+  <div class="about text-center mt-5 pt-5">
     <div class="container">
       <div>
         <div class="bg-white p-5 mx-auto border" style="width:350px">
@@ -11,6 +11,16 @@
             loading="lazy"
           />
           <form>
+            <div class="form-group">
+              <input
+                type="text"
+                v-model="name"
+                class="form-control bg-light"
+                id="exampleInputUsername1"
+                aria-describedby="usernameHelp"
+                placeholder="Username"
+              />
+            </div>
             <div class="form-group">
               <input
                 type="email"
@@ -33,6 +43,7 @@
             <div class="form-group">
               <input
                 type="password"
+                @click="checkEnabled"
                 v-model="passwordRepeat"
                 class="form-control bg-light"
                 id="exampleInputPassword2"
@@ -40,10 +51,21 @@
               />
             </div>
             <button
+              v-if="enable"
               type="button"
               @click="signup"
               class="btn btn-primary"
-              style="font-size: 13px; font-weight:600;"
+              style="font-size: 13px; font-weight:600; width:250px;"
+            >
+              Sign Up
+            </button>
+            <button
+              v-if="!enable"
+              type="button"
+              @click="signup"
+              class="btn btn-primary"
+              style="font-size: 13px; font-weight:600; width:250px;"
+              disabled
             >
               Sign Up
             </button>
@@ -60,11 +82,16 @@
 
 <script>
 import firebase from "@/firebase";
+import store from "@/store";
+
+let enable = false;
 
 export default {
   name: "Signup",
   data() {
     return {
+      enable,
+      name: "",
       username: "",
       password: "",
       passwordRepeat: "",
@@ -72,13 +99,15 @@ export default {
   },
   methods: {
     signup() {
+      store.displayName = this.name;
       if (this.password === this.passwordRepeat) {
         firebase
           .auth()
           .createUserWithEmailAndPassword(
             this.username,
             this.password,
-            this.passwordRepeat
+            this.passwordRepeat,
+            this.name
           )
           .then(function() {
             console.log("Uspjesna registracija");
@@ -92,6 +121,11 @@ export default {
         alert("Repeat password doesn't match password!");
       }
     },
+    checkEnabled() {
+      if (this.password != "") {
+        this.enable = true;
+      }
+    },
   },
 };
 </script>
@@ -100,6 +134,7 @@ export default {
 body {
   font-size: 14px;
 }
+input[type="text"],
 input[type="email"],
 input[type="password"],
 input,

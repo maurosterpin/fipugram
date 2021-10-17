@@ -1,7 +1,8 @@
 <template>
   <div class="row">
     <div class="col-1"></div>
-    <div class="col-6">
+    <div class="col-1"></div>
+    <div class="col-5">
       <!-- nova forma za post -->
       <form @submit.prevent="postNewImage" class="mb-5">
         <div class="form-group">
@@ -21,7 +22,7 @@
         :info="card"
       />
     </div>
-    <div class="col-4-sm">
+    <!--<div class="col-4-sm">
       <div class="card">
         <div class="card-body">
           <h6 class="card-title text-muted">
@@ -65,7 +66,8 @@
           {{ store.searchName }} {{ store.searchLastName }}
         </div>
       </div>
-    </div>
+    </div>-->
+    <div class="col-5"></div>
   </div>
 </template>
 
@@ -81,7 +83,7 @@ import { db, storage } from "@/firebase";
 let suggestions = [];
 let stories = [];
 
-stories = [
+/*stories = [
   {
     user: "username1",
     url: "https://picsum.photos/id/1015/800",
@@ -109,7 +111,7 @@ suggestions = [
     user: "username3",
     url: "https://picsum.photos/id/1056/800",
   },
-];
+];*/
 
 /*cards = [
   {
@@ -165,8 +167,8 @@ export default {
               id: doc.id,
               time: data.posted_at,
               url: data.url,
-              user: data.url,
-              pic: data.url,
+              user: data.displayName,
+              pic: data.pic,
             });
           });
         });
@@ -190,9 +192,12 @@ export default {
         let doc = await db.collection("posts").add({
           url: url,
           user: store.currentUser,
+          displayName: store.displayName,
           posted_at: Date.now(),
+          pic: store.profilePic,
         });
         console.log("Spremljeno", doc);
+        console.log("LINK!!!", store.profilePic);
         this.newImageUrl = "";
         this.imageReference.remove();
         this.getPosts();
