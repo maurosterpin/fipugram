@@ -22,51 +22,6 @@
         :info="card"
       />
     </div>
-    <!--<div class="col-4-sm">
-      <div class="card">
-        <div class="card-body">
-          <h6 class="card-title text-muted">
-            <strong>Stories</strong>
-          </h6>
-          <story v-for="story in stories" :key="story" :info="story" />
-        </div>
-      </div>
-      <div class="card mt-4">
-        <div class="card-body">
-          <h6 class="card-title text-muted">
-            <strong>Suggestions for you</strong>
-          </h6>
-          <suggestion
-            v-for="suggestion in suggestions"
-            :key="suggestion"
-            :info="suggestion"
-          />
-        </div>
-      </div>
-      <form class="form-inline float-left mt-4">
-        <input
-          v-model="store.searchName"
-          class="form-control mr-sm-2"
-          type="search"
-          placeholder="Name"
-          aria-label="Search"
-        />
-      </form>
-      <form class="form-inline mx-auto mt-4">
-        <input
-          v-model="store.searchLastName"
-          class="form-control mr-sm-2"
-          type="search"
-          placeholder="Last Name"
-          aria-label="Search"
-        />
-      </form>
-      <div class="card mt-2">
-        <div class="card-body">
-          {{ store.searchName }} {{ store.searchLastName }}
-        </div>
-      </div>
-    </div>-->
     <div class="col-5"></div>
   </div>
 </template>
@@ -78,61 +33,11 @@ import Story from "@/components/Story.vue";
 import FipugramCard from "@/components/FipugramCard.vue";
 import store from "@/store";
 import { db, storage } from "@/firebase";
+import firebase from "@/firebase";
 
 //let cards = [];
 let suggestions = [];
 let stories = [];
-
-/*stories = [
-  {
-    user: "username1",
-    url: "https://picsum.photos/id/1015/800",
-  },
-  {
-    user: "username2",
-    url: "https://picsum.photos/id/1051/800",
-  },
-  {
-    user: "username3",
-    url: "https://picsum.photos/id/1056/800",
-  },
-];
-
-suggestions = [
-  {
-    user: "username1",
-    url: "https://picsum.photos/id/1015/800",
-  },
-  {
-    user: "username2",
-    url: "https://picsum.photos/id/1051/800",
-  },
-  {
-    user: "username3",
-    url: "https://picsum.photos/id/1056/800",
-  },
-];*/
-
-/*cards = [
-  {
-    url: "https://picsum.photos/id/1015/800",
-    user: "username1",
-    pic: "@/assets/44.jpg",
-    time: "1 DAY AGO",
-  },
-  {
-    url: "https://picsum.photos/id/1051/800",
-    user: "username2",
-    pic: "@/assets/51.jpg",
-    time: "2 DAYS AGO",
-  },
-  {
-    url: "https://picsum.photos/id/1056/800",
-    user: "username3",
-    pic: "@/assets/92.jpg",
-    time: "3 DAYS AGO",
-  },
-];*/
 
 export default {
   name: "Home",
@@ -147,7 +52,39 @@ export default {
     };
   },
   mounted() {
+    const user = firebase.auth().currentUser;
+
+    db.collection("users")
+      .doc(user.uid)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          console.log("User exists!");
+          store.displayName = doc.data().username;
+          store.profilePic = doc.data().profilePic;
+        } else {
+          const dataBase = db.collection("users").doc(user.uid);
+          const UIDtest = user.uid;
+          console.log("User UID STRING!", UIDtest);
+          dataBase.set({
+            username: store.displayName,
+            profilePic: store.profilePic,
+            posts: [],
+          });
+          console.log("User added!");
+        }
+      });
+
     console.log("TEST!!!", this.getPosts());
+    /*db.collection("posts")
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.forEach((doc) => {
+          //store.displayName = doc.data().username;
+          console.log(store.displayName);
+          //store.profilePic = doc.data().profilePic;
+        });
+      });*/
   },
   methods: {
     getPosts() {
@@ -196,6 +133,11 @@ export default {
           posted_at: Date.now(),
           pic: store.profilePic,
         });
+        db.collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .update({
+            posts: url,
+          });
         console.log("Spremljeno", doc);
         console.log("LINK!!!", store.profilePic);
         this.newImageUrl = "";

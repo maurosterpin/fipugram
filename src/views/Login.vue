@@ -24,6 +24,7 @@
             <div class="form-group">
               <input
                 v-model="password"
+                @click="checkEnabled"
                 type="password"
                 class="form-control bg-light"
                 id="exampleInputPassword1"
@@ -87,6 +88,11 @@ export default {
         .catch(function(error) {
           console.log("Greska", error);
         });
+    },
+    checkEnabled() {
+      if (this.username != "") {
+        this.enable = true;
+      }
     },
   },
 };

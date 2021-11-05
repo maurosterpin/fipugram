@@ -83,6 +83,7 @@
 <script>
 import firebase from "@/firebase";
 import store from "@/store";
+import { db, storage } from "@/firebase";
 
 let enable = false;
 
@@ -95,11 +96,13 @@ export default {
       username: "",
       password: "",
       passwordRepeat: "",
+      profilePic:
+        "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg",
+      posts: [],
     };
   },
   methods: {
     signup() {
-      store.displayName = this.name;
       if (this.password === this.passwordRepeat) {
         firebase
           .auth()
@@ -120,6 +123,10 @@ export default {
       } else {
         alert("Repeat password doesn't match password!");
       }
+      store.displayName = this.name;
+      store.profilePic =
+        "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg";
+      console.log(this.name);
     },
     checkEnabled() {
       if (this.password != "") {

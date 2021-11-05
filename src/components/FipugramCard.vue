@@ -51,12 +51,9 @@
         Liked by <strong>{{ info.user }}</strong> and
         <strong>others</strong>
       </div>
-      <div>
-        <strong>{{ info.user }}</strong> city, country
-      </div>
       <div>{{ postedFromNow }}</div>
     </div>
-    <div class="input-group input-group-lg">
+    <!--<div class="input-group input-group-lg">
       <input
         type="text"
         class="form-control"
@@ -74,7 +71,7 @@
           <span style="opacity: 0.5;">Post</span>
         </button>
       </div>
-    </div>
+    </div>-->
   </div>
 </template>
 
