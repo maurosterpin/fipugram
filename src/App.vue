@@ -48,7 +48,13 @@
             <router-link to="/signup" class="nav-link">Signup</router-link>
           </li>-->
           <li v-if="store.currentUser" class="nav-item">
-            <router-link to="/profile" class="nav-link">Profile</router-link>
+            <router-link
+              :to="{
+                name: 'myProfile',
+              }"
+              class="nav-link"
+              ><span @click="setCurrentUser">Profile</span></router-link
+            >
           </li>
           <li v-if="store.currentUser" class="nav-item">
             <a href="#" @click="logout" class="nav-link">Sign out</a>
@@ -92,6 +98,11 @@ export default {
     };
   },
   methods: {
+    setCurrentUser() {
+      store.visitedProfile = store.currentUserUid;
+
+      console.log("UID I UID", store.currentUserUid, store.visitedProfile);
+    },
     logout() {
       firebase
         .auth()

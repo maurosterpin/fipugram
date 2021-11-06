@@ -1,60 +1,79 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Home from "../views/Home.vue";
 import store from "@/store";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
+    path: "/",
+    name: "Home",
     component: Home,
     meta: {
-      needsUser: true
-    }
+      needsUser: true,
+    },
   },
   {
-    path: '/login',
-    name: 'Login',
+    path: "/login",
+    name: "Login",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue')
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Login.vue"),
   },
   {
-    path: '/signup',
-    name: 'Signup',
+    path: "/signup",
+    name: "Signup",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Signup.vue')
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Signup.vue"),
   },
   {
-    path: '/profile',
-    name: 'Profile',
+    path: "/profile/:profileUid",
+    name: "Profile",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Profile.vue')
-  }
-]
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/Profile.vue"),
+  },
+  {
+    path: "/myProfile",
+    name: "myProfile",
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/myProfile.vue"),
+  },
+];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
 router.beforeEach((to, from, next) => {
-  console.log("Stara ruta", from.name, " -> ", to.name, "korisnik", store.currentUser)
+  console.log(
+    "Stara ruta",
+    from.name,
+    " -> ",
+    to.name,
+    "korisnik",
+    store.currentUser
+  );
   const noUser = store.currentUser === null;
 
-  if(noUser && to.meta.needsUser) {
+  if (noUser && to.meta.needsUser) {
     next("Login");
   } else {
     next();
   }
-})
+});
 
-export default router
+export default router;

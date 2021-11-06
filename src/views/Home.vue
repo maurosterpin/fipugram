@@ -2,19 +2,7 @@
   <div class="row">
     <div class="col-1"></div>
     <div class="col-1"></div>
-    <div class="col-5">
-      <!-- nova forma za post -->
-      <form @submit.prevent="postNewImage" class="mb-5">
-        <div class="form-group">
-          <croppa
-            :width="400"
-            :height="400"
-            placeholder="Upload img"
-            v-model="imageReference"
-          ></croppa>
-        </div>
-        <button type="submit" class="btn btn-primary ml-2">Post image</button>
-      </form>
+    <div class="col-8">
       <!-- listanje kartica -->
       <fipugram-card
         v-for="card in filteredCards"
@@ -22,7 +10,7 @@
         :info="card"
       />
     </div>
-    <div class="col-5"></div>
+    <div class="col-2"></div>
   </div>
 </template>
 
@@ -53,6 +41,7 @@ export default {
   },
   mounted() {
     const user = firebase.auth().currentUser;
+    this.store.currentUserUid = user.uid;
 
     db.collection("users")
       .doc(user.uid)
@@ -69,7 +58,8 @@ export default {
           dataBase.set({
             username: store.displayName,
             profilePic: store.profilePic,
-            posts: [],
+
+            uid: UIDtest,
           });
           console.log("User added!");
         }
@@ -106,46 +96,10 @@ export default {
               url: data.url,
               user: data.displayName,
               pic: data.pic,
+              uid: data.uid,
             });
           });
         });
-    },
-    getImage() {
-      return new Promise((resolveFn, errorFn) => {
-        this.imageReference.generateBlob((data) => {
-          resolveFn(data);
-        });
-      });
-    },
-    async postNewImage() {
-      try {
-        let blobData = await this.getImage();
-        let imageName =
-          "posts/" + store.currentUser + "/" + Date.now() + ".png";
-        let result = await storage.ref(imageName).put(blobData);
-        let url = await result.ref.getDownloadURL();
-        console.log("Public link: ", url);
-        const imageUrl = this.newImageUrl;
-        let doc = await db.collection("posts").add({
-          url: url,
-          user: store.currentUser,
-          displayName: store.displayName,
-          posted_at: Date.now(),
-          pic: store.profilePic,
-        });
-        db.collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .update({
-            posts: url,
-          });
-        console.log("Spremljeno", doc);
-        console.log("LINK!!!", store.profilePic);
-        this.newImageUrl = "";
-        this.imageReference.remove();
-        this.getPosts();
-      } catch (e) {
-        console.error("Error", e);
-      }
     },
   },
 

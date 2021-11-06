@@ -3,12 +3,23 @@
     <div class="container">
       <div v-if="!upload" class="profileHeader">
         <img
+          v-if="myProfile"
           v-on:click="uploadPfp"
           class="pfp"
           v-bind:src="this.pfp"
           alt="profilePhoto"
         />
-        <h5 class="mb-4 pfpName">Username</h5>
+        <img
+          v-if="!myProfile"
+          class="pfp"
+          v-bind:src="this.pfp"
+          alt="profilePhoto"
+        />
+        <h5 class="mb-4 pfpName">{{ this.name }}</h5>
+      </div>
+
+      <div class="posts" v-for="(item, index) in cards" :key="index">
+        <img v-if="!upload" :src="item" />
       </div>
 
       <div
@@ -39,25 +50,64 @@
 import store from "@/store";
 import { db, storage } from "@/firebase";
 import firebase from "@/firebase";
+import router from "@/router";
 
 export default {
   name: "Profile",
   data() {
     return {
-      name: "",
+      name: null,
       imageReference: null,
       newProfileUrl: "",
       upload: false,
       pfp: null,
+      cards: [],
+      myProfile: null,
     };
   },
   mounted() {
-    this.pfp = store.profilePic;
-    console.log("IMGHOLDER", this.pfp);
+    if (store.currentUserUid == store.visitedProfile) {
+      router.push({ name: "myProfile" });
+    }
+    console.log("UID I UID", store.currentUserUid, store.visitedProfile);
+    this.getUserdata();
+    db.collection("users")
+      .doc(store.visitedProfile)
+      .get()
+      .then((doc) => {
+        this.name = doc.data().username;
+        this.pfp = doc.data().profilePic;
+      });
+    this.getPosts();
   },
   methods: {
     uploadPfp() {
       this.upload = !this.upload;
+    },
+    getUserdata() {
+      if (store.currentUserUid == store.visitedProfile) {
+        this.myProfile = true;
+      } else {
+        this.myProfile = false;
+      }
+    },
+    async getPosts() {
+      console.log("Firebase dohvat postova");
+
+      await db
+        .collection("users")
+        .doc(store.visitedProfile)
+        .collection("posts")
+        .get()
+        .then((query) => {
+          this.cards = [];
+          query.forEach((doc) => {
+            const data = doc.data();
+            console.log("Post", data.url);
+            this.cards.push(data.url);
+          });
+        });
+      console.log(this.cards[0]);
     },
     getImage() {
       return new Promise((resolveFn, errorFn) => {
@@ -66,45 +116,36 @@ export default {
         });
       });
     },
-    async postNewProfilePic() {
-      try {
-        let blobData = await this.getImage();
-        let imageName =
-          "profilePics/" + store.currentUser + "/" + Date.now() + ".png";
-        let result = await storage.ref(imageName).put(blobData);
-        let url = await result.ref.getDownloadURL();
-        const profileImg = url;
-        store.profilePic = profileImg;
-        console.log("LINK!!!!!", store.profilePic);
-        console.log("Public link: ", url);
-        firebase.auth().onAuthStateChanged((user) => {
-          if (user) {
-            db.collection("users")
-              .doc(user.uid)
-              .update({
-                profilePic: url,
-              });
-            console.log("Uspjesno novi pfp!");
-            store.profilePic = url;
-            this.pfp = store.profilePic;
-            this.upload = !this.upload;
-          }
-        });
-
-        console.log("Spremljeno", doc);
-        this.imageReference.remove();
-      } catch (e) {
-        console.error("Error", e);
-      }
-    },
   },
-  computed: {},
+  // computed: {
+  //   name() {
+  //     db.collection("users")
+  //       .doc(store.visitedProfile)
+  //       .get()
+  //       .then((doc) => {
+  //         return doc.data().username;
+  //       });
+  //   },
+  // },
+  watch: {
+    name() {},
+  },
 };
 </script>
 
 <style>
 body {
   font-size: 14px;
+  min-height: 118vh;
+  overflow-x: hidden;
+}
+
+.posts img {
+  width: 350px;
+  height: 350px;
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
 }
 
 .profileHeader {
@@ -115,7 +156,6 @@ body {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  cursor: pointer;
 }
 
 .pfpName {
