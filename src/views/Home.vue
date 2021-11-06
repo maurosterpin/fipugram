@@ -1,12 +1,12 @@
 <template>
   <div class="row">
-    <div class="col-1"></div>
-    <div class="col-1"></div>
-    <div class="col-8">
+    <div class="col-md-2 col-sm-1 col-0"></div>
+
+    <div class="col-md-8 col-sm-10 col-12">
       <!-- listanje kartica -->
       <FipugramCard v-for="card in filteredCards" :key="card.id" :info="card" />
     </div>
-    <div class="col-2"></div>
+    <div class="col-md-2 col-sm-1 col-0"></div>
   </div>
 </template>
 
@@ -114,3 +114,5 @@ export default {
   },
 };
 </script>
+
+<style></style>

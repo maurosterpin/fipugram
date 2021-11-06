@@ -17,7 +17,7 @@
         />
         <h5 class="mb-4 pfpName">{{ this.name }}</h5>
         <h6 class="postImg">
-          <span @click="postNew">Post image</span>
+          <span class="postNew" @click="postNew">Post image</span>
         </h6>
       </div>
 
@@ -51,7 +51,7 @@
         class="bg-white p-5 mx-auto border"
         style="width:500px; height: 620px"
       >
-        <h3 class="mb-4">Post image</h3>
+        <h3 class="mb-4"><span class="postImage">Post image</span></h3>
         <form @submit.prevent="postNewImage" class="mb-5">
           <div class="form-group">
             <croppa

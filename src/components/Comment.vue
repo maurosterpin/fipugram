@@ -21,14 +21,6 @@ export default {
 </script>
 
 <style>
-.commentHeader {
-  padding: 25px 30px 0px;
-}
-
-.comments {
-  height: 898px;
-}
-
 .comment {
   padding: 5px 0px;
 }
