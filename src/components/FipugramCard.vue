@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="postContainer">
     <div class="card left mb-4">
       <div @click="getUid" class="card-header bg-transparent">
         <img :src="info.pic" width="35" class="rounded-circle" />
@@ -56,12 +56,14 @@
       </div>
       <div class="input-group input-group-lg">
         <input
+          v-model="commentContent"
           type="text"
           class="form-control"
           placeholder="Add a comment..."
           aria-label="Comment"
           aria-describedby="button-addon2"
         />
+
         <div class="input-group-append bg-transparent">
           <button
             class="btn bg-transparent border text-primary"
@@ -69,7 +71,7 @@
             id="button-addon2"
             style="font-weight: 600; font-size: 15px;"
           >
-            <span style="opacity: 0.5;">Post</span>
+            <span @click="postComment" style="opacity: 0.5;">Post</span>
           </button>
         </div>
       </div>
@@ -77,16 +79,7 @@
     <div class="card right">
       <span class="rightHeader"><strong class="ml-3">Comments </strong></span>
       <div class="comments">
-        <div class="commentHeader">
-          <img :src="info.pic" width="35" class="rounded-circle" />
-          <strong class="ml-3">{{ info.user }}</strong>
-          <div class="comment">This is a comment</div>
-        </div>
-        <div class="commentHeader">
-          <img :src="info.pic" width="35" class="rounded-circle" />
-          <strong class="ml-3">{{ info.user }}</strong>
-          <div class="comment">This is a comment</div>
-        </div>
+        <Comment v-for="(item, index) in comments" :key="index" :info="item" />
       </div>
     </div>
   </div>
@@ -121,14 +114,23 @@
 .rightHeader {
   padding: 19px;
   border-bottom: 1px solid lightgray;
+  height: 100%;
 }
 
 .commentHeader {
   padding: 25px 30px 0px;
 }
 
+.comments {
+  height: 898px;
+}
+
 .comment {
   padding: 5px 0px;
+}
+
+.timeRight {
+  float: right;
 }
 </style>
 
@@ -138,13 +140,23 @@ import { db, storage } from "@/firebase";
 import firebase from "@/firebase";
 import store from "@/store";
 import router from "@/router";
+import Comment from "@/components/Comment.vue";
 
 const user = firebase.auth().currentUser;
 console.log("FipugramCARDUSER", user);
 
 export default {
+  data() {
+    return {
+      comments: [],
+      commentContent: "",
+    };
+  },
   props: ["info"],
   name: "FipugramCard",
+  mounted() {
+    this.getComments();
+  },
   methods: {
     async getUid() {
       store.visitedProfile = this.info.uid;
@@ -155,11 +167,48 @@ export default {
         params: { profileUid: store.visitedProfile },
       });
     },
+    postComment() {
+      console.log("TEST POST COMMENT");
+      db.collection("posts")
+        .doc(this.info.id)
+        .collection("comments")
+        .add({
+          content: this.commentContent,
+          pfp: store.profilePic,
+          username: store.displayName,
+          posted_at: Date.now(),
+        });
+      this.commentContent = "";
+    },
+    getComments() {
+      db.collection("posts")
+        .doc(this.info.id)
+        .collection("comments")
+        .orderBy("posted_at")
+        .get()
+        .then((query) => {
+          this.cards = [];
+          query.forEach((doc) => {
+            //console.log("ID: ", doc.id);
+            //console.log("Podaci: ", doc.data());
+            const data = doc.data();
+            this.comments.push({
+              pic: data.pfp,
+              name: data.username,
+              content: data.content,
+              time: data.posted_at,
+            });
+          });
+        });
+    },
   },
   computed: {
     postedFromNow() {
       return moment(this.info.time).fromNow();
     },
+  },
+  components: {
+    Comment,
   },
 };
 </script>

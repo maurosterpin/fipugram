@@ -4,11 +4,7 @@
     <div class="col-1"></div>
     <div class="col-8">
       <!-- listanje kartica -->
-      <fipugram-card
-        v-for="card in filteredCards"
-        :key="card.id"
-        :info="card"
-      />
+      <FipugramCard v-for="card in filteredCards" :key="card.id" :info="card" />
     </div>
     <div class="col-2"></div>
   </div>
@@ -92,6 +88,7 @@ export default {
             const data = doc.data();
             this.cards.push({
               id: doc.id,
+              docID: doc,
               time: data.posted_at,
               url: data.url,
               user: data.displayName,
