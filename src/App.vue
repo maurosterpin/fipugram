@@ -28,7 +28,7 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarToggler">
-        <form v-if="store.currentUser" class="form-inline mx-auto">
+        <form v-if="store.currentUser" class="form-inline test">
           <input
             v-model="store.searchTerm"
             class="form-control bg-light"
@@ -122,6 +122,16 @@ body {
 }
 body {
   position: relative;
+}
+
+.test {
+  margin-left: 37%;
+}
+
+@media screen and (max-width: 1220px) {
+  .test {
+    margin-left: 30%;
+  }
 }
 
 #app {

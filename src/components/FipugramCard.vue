@@ -10,6 +10,23 @@
       <img :src="info.url" />
       <div class="card-img-top card-footer text-muted bg-transparent">
         <svg
+          v-if="isLiked"
+          @click="likePost"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="red"
+          class="bi bi-heart"
+          viewBox="0 0 16 16"
+          cursor="pointer"
+        >
+          <path
+            d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
+          />
+        </svg>
+        <svg
+          v-else
+          @click="likePost"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
@@ -48,9 +65,16 @@
             d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"
           />
         </svg>-->
-        <div>
-          Liked by <strong>{{ info.user }}</strong> and
-          <strong>others</strong>
+        <div v-if="this.likes.length > 0">
+          Liked by <strong>{{ this.likes[0].user }}</strong
+          ><span class="showOthers" v-if="this.likes.length > 1">
+            and <strong>others</strong></span
+          >
+          <div class="cardLikes">
+            <span v-for="(item, index) in likes" :key="index">{{
+              `${item.user} `
+            }}</span>
+          </div>
         </div>
         <div>{{ postedFromNow }}</div>
       </div>
@@ -100,6 +124,20 @@
 .link {
   text-decoration: none;
   color: #2c3e50;
+}
+
+.cardLikes {
+  position: absolute;
+  margin-left: 25px;
+  display: none;
+}
+
+.showOthers {
+  cursor: pointer;
+}
+
+.showOthers:hover + .cardLikes {
+  display: inline;
 }
 
 .left {
@@ -169,13 +207,17 @@ export default {
   data() {
     return {
       comments: [],
+      likes: [],
       commentContent: "",
+      isLiked: false,
     };
   },
   props: ["info"],
   name: "FipugramCard",
   mounted() {
     this.getComments();
+    this.getLikes();
+    this.checkLiked();
   },
   methods: {
     async getUid() {
@@ -207,7 +249,6 @@ export default {
         .orderBy("posted_at")
         .get()
         .then((query) => {
-          this.cards = [];
           query.forEach((doc) => {
             //console.log("ID: ", doc.id);
             //console.log("Podaci: ", doc.data());
@@ -220,6 +261,44 @@ export default {
             });
           });
         });
+    },
+    likePost() {
+      console.log("LikePost");
+      db.collection("posts")
+        .doc(this.info.id)
+        .collection("likes")
+        .doc(store.currentUserUid)
+        .set({
+          user: store.displayName,
+          liked_at: Date.now(),
+        });
+    },
+    getLikes() {
+      db.collection("posts")
+        .doc(this.info.id)
+        .collection("likes")
+        .orderBy("liked_at")
+        .get()
+        .then((query) => {
+          query.forEach((doc) => {
+            const data = doc.data();
+            this.likes.push({
+              user: data.user,
+              time: data.liked_at,
+            });
+          });
+        });
+    },
+    checkLiked() {
+      console.log("TEST LIKED");
+      /*for (let i; i < likes.length; i++) {
+        if (likes[i].name == store.displayName) {
+          this.isLiked = true;
+          return;
+        }
+      }
+      this.isLiked = false;
+      return;*/
     },
   },
   computed: {

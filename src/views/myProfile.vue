@@ -152,7 +152,7 @@ export default {
         firebase.auth().onAuthStateChanged((user) => {
           if (user) {
             db.collection("users")
-              .doc(user.uid)
+              .doc(store.currentUserUid)
               .update({
                 profilePic: url,
               });
@@ -220,6 +220,9 @@ body {
   font-size: 14px;
   min-height: 118vh;
   overflow-x: hidden;
+}
+.posts {
+  margin: auto;
 }
 
 .posts img {
