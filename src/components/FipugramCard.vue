@@ -9,23 +9,25 @@
       <div class="card-body p-0"></div>
       <img :src="info.url" />
       <div class="card-img-top card-footer text-muted bg-transparent">
+        <span v-for="(item, index) in computedLikes" :key="index">
+          <svg
+            v-if="item.user == displayName && computedIsLiked == true"
+            @click="removeLike"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="red"
+            class="bi bi-heart"
+            viewBox="0 0 16 16"
+            cursor="pointer"
+          >
+            <path
+              d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
+            />
+          </svg>
+        </span>
         <svg
-          v-if="isLiked"
-          @click="likePost"
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="red"
-          class="bi bi-heart"
-          viewBox="0 0 16 16"
-          cursor="pointer"
-        >
-          <path
-            d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
-          />
-        </svg>
-        <svg
-          v-else
+          v-if="computedIsLiked != true"
           @click="likePost"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -39,6 +41,7 @@
             d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
           />
         </svg>
+
         <!--<svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -104,7 +107,7 @@
         <span class="rightHeader"><strong class="ml-3">Comments </strong></span>
         <div class="comments">
           <Comment
-            v-for="(item, index) in comments"
+            v-for="(item, index) in filteredComments"
             :key="index"
             :info="item"
           />
@@ -180,7 +183,7 @@
 }
 
 .comments {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .comment {
@@ -209,7 +212,8 @@ export default {
       comments: [],
       likes: [],
       commentContent: "",
-      isLiked: false,
+      isLiked: null,
+      displayName: "",
     };
   },
   props: ["info"],
@@ -218,6 +222,7 @@ export default {
     this.getComments();
     this.getLikes();
     this.checkLiked();
+    this.displayName = store.displayName;
   },
   methods: {
     async getUid() {
@@ -241,6 +246,7 @@ export default {
           posted_at: Date.now(),
         });
       this.commentContent = "";
+      this.getComments();
     },
     getComments() {
       db.collection("posts")
@@ -249,10 +255,12 @@ export default {
         .orderBy("posted_at")
         .get()
         .then((query) => {
+          this.comments = [];
           query.forEach((doc) => {
             //console.log("ID: ", doc.id);
             //console.log("Podaci: ", doc.data());
             const data = doc.data();
+
             this.comments.push({
               pic: data.pfp,
               name: data.username,
@@ -261,6 +269,15 @@ export default {
             });
           });
         });
+    },
+    removeLike() {
+      db.collection("posts")
+        .doc(this.info.id)
+        .collection("likes")
+        .doc(store.currentUserUid)
+        .delete();
+      this.getLikes();
+      this.isLiked = false;
     },
     likePost() {
       console.log("LikePost");
@@ -271,7 +288,9 @@ export default {
         .set({
           user: store.displayName,
           liked_at: Date.now(),
+          liked: true,
         });
+      this.getLikes();
     },
     getLikes() {
       db.collection("posts")
@@ -280,8 +299,12 @@ export default {
         .orderBy("liked_at")
         .get()
         .then((query) => {
+          this.likes = [];
           query.forEach((doc) => {
             const data = doc.data();
+            if (data.user == store.displayName) {
+              this.isLiked = data.liked;
+            }
             this.likes.push({
               user: data.user,
               time: data.liked_at,
@@ -304,6 +327,15 @@ export default {
   computed: {
     postedFromNow() {
       return moment(this.info.time).fromNow();
+    },
+    filteredComments() {
+      return this.comments;
+    },
+    computedLikes() {
+      return this.likes;
+    },
+    computedIsLiked() {
+      return this.isLiked;
     },
   },
   components: {

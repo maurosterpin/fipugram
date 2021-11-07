@@ -21,7 +21,7 @@
         </h6>
       </div>
 
-      <div class="posts" v-for="(item, index) in cards" :key="index">
+      <div class="posts" v-for="(item, index) in computedPosts" :key="index">
         <img v-if="!upload && !post" :src="item" />
       </div>
 
@@ -207,6 +207,12 @@ export default {
       } catch (e) {
         console.error("Error", e);
       }
+      this.post = !this.post;
+    },
+  },
+  computed: {
+    computedPosts() {
+      return this.cards;
     },
   },
   watch: {

@@ -18,7 +18,7 @@
         <h5 class="mb-4 pfpName">{{ this.name }}</h5>
       </div>
 
-      <div class="posts" v-for="(item, index) in cards" :key="index">
+      <div class="posts" v-for="(item, index) in computedPosts" :key="index">
         <img v-if="!upload" :src="item" />
       </div>
 
@@ -127,6 +127,11 @@ export default {
   //       });
   //   },
   // },
+  computed: {
+    computedPosts() {
+      return this.cards;
+    },
+  },
   watch: {
     name() {},
   },
