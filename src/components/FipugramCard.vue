@@ -1,9 +1,14 @@
 <template>
   <div class="postContainer">
     <div class="card left mb-4">
-      <div @click="getUid" class="card-header bg-transparent">
-        <img :src="info.pic" width="35" class="rounded-circle" />
-        <strong class="ml-3">{{ info.user }}</strong>
+      <div class="card-header bg-transparent">
+        <span @click="getUid">
+          <img :src="info.pic" width="35" class="rounded-circle" />
+          <strong class="ml-3">{{ info.user }}</strong>
+        </span>
+        <span v-if="info.user == displayName" class="x"
+          ><strong>Delete</strong></span
+        >
       </div>
 
       <div class="card-body p-0"></div>
@@ -93,12 +98,12 @@
 
         <div class="input-group-append bg-transparent">
           <button
-            class="btn bg-transparent border text-primary"
+            class="btn bg-transparent border text-primary postBTN"
             type="button"
             id="button-addon2"
             style="font-weight: 600; font-size: 15px;"
           >
-            <span @click="postComment" style="opacity: 0.5;">Post</span>
+            <span @click="postComment">Post</span>
           </button>
         </div>
       </div>
@@ -193,6 +198,28 @@
 .timeRight {
   float: right;
 }
+
+.x {
+  cursor: pointer;
+  float: right;
+  padding: 5px;
+  margin-top: 2.5px;
+}
+
+.x:hover {
+  color: red;
+  opacity: 90%;
+  transition-duration: 0.1s;
+}
+
+.postBTN {
+  opacity: 50%;
+}
+
+.postBTN:hover {
+  opacity: 80%;
+  transition-duration: 0.1s;
+}
 </style>
 
 <script>
@@ -214,15 +241,18 @@ export default {
       commentContent: "",
       isLiked: null,
       displayName: "",
+      newPfp: null,
     };
   },
   props: ["info"],
   name: "FipugramCard",
   mounted() {
+    console.log("PFP TEST", this.info.pic);
     this.getComments();
     this.getLikes();
     this.checkLiked();
     this.displayName = store.displayName;
+    this.currentUserPfp();
   },
   methods: {
     async getUid() {
@@ -233,6 +263,61 @@ export default {
         name: "Profile",
         params: { profileUid: store.visitedProfile },
       });
+    },
+    currentUserPfp() {
+      db.collection("users")
+        .doc(store.currentUserUid)
+        .get()
+        .then((doc) => {
+          this.newPfp = doc.data().profilePic;
+        });
+      this.updatePostPfp();
+      this.updateCommentPfp();
+    },
+    updatePostPfp() {
+      db.collection("posts")
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc2) {
+            if (doc2.data().displayName == store.displayName) {
+              db.collection("users")
+                .doc(store.currentUserUid)
+                .get()
+                .then((doc) => {
+                  doc2.ref.update({
+                    pic: doc.data().profilePic,
+                  });
+                  console.log("PFP", doc.data().profilePic);
+                });
+            }
+          });
+        });
+    },
+    updateCommentPfp() {
+      db.collection("posts")
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc2) {
+            doc2
+              .collection("comments")
+              .get()
+              .then(function(querySnapshot) {
+                querySnapshot.forEach(function(doc3) {
+                  if (doc2.data().displayName == store.displayName) {
+                    db.collection("users")
+                      .doc(store.currentUserUid)
+                      .get()
+                      .then((doc) => {
+                        doc3.ref.update({
+                          pfp: doc.data().profilePic,
+                        });
+                        console.log("PFP", doc.data().profilePic);
+                      });
+                  }
+                });
+              });
+          });
+        });
     },
     postComment() {
       console.log("TEST POST COMMENT");
@@ -270,6 +355,7 @@ export default {
           });
         });
     },
+    removePost() {},
     removeLike() {
       db.collection("posts")
         .doc(this.info.id)
@@ -336,6 +422,9 @@ export default {
     },
     computedIsLiked() {
       return this.isLiked;
+    },
+    computedPfp() {
+      return this.newPfp;
     },
   },
   components: {
